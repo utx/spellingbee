@@ -8,15 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #4CAF50;
-            --secondary: #2196F3;
-            --warning: #f44336;
-            --success: #4CAF50;
-        }
-        
-        body {
+        * {
             font-family: 'Fredoka', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
             margin: 0;
             padding: 20px;
             background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
@@ -25,7 +22,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .container {
             background: white;
             padding: 2rem;
@@ -35,16 +32,16 @@
             width: 90%;
             text-align: center;
         }
-        
+
         h1 {
             color: #333;
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .button {
-            background: var(--secondary);
+            background: #2196F3;
             color: white;
             border: none;
             padding: 1rem 2rem;
@@ -55,32 +52,35 @@
             transition: transform 0.2s, box-shadow 0.2s;
             font-family: 'Fredoka', sans-serif;
         }
-        
+
         .button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        
+
         .score {
             font-size: 1.5rem;
-            color: var(--primary);
+            color: #4CAF50;
             margin: 1rem 0;
         }
-        
+
         .feedback {
             font-size: 1.2rem;
             margin: 1rem 0;
             min-height: 2rem;
         }
-        
-        .feedback.correct {
-            color: var(--success);
+
+        .hint {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: #666;
+            min-height: 2rem;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            display: none;
         }
-        
-        .feedback.incorrect {
-            color: var(--warning);
-        }
-        
+
         input[type="text"] {
             padding: 1rem;
             font-size: 1.2rem;
@@ -92,38 +92,27 @@
             text-align: center;
             font-family: 'Fredoka', sans-serif;
         }
-        
-        .success-screen {
-            display: none;
-            text-align: center;
-        }
-        
-        .success-screen h2 {
-            color: var(--success);
-            font-size: 2rem;
-        }
-        
-        .icon {
-            font-size: 2rem;
-            margin: 1rem;
-        }
-        
+
         .group-selection {
             display: grid;
             gap: 1rem;
             margin: 2rem 0;
         }
-        
-        #quiz-container {
-            display: none;
-        }
-        
-        .show-answer {
+
+        .hint-button {
             background: #ff9800;
         }
-        
-        .restart {
-            background: var(--primary);
+
+        .show-answer {
+            background: #f44336;
+        }
+
+        .correct {
+            color: #4CAF50;
+        }
+
+        .incorrect {
+            color: #f44336;
         }
     </style>
 </head>
@@ -132,191 +121,227 @@
         <div id="start-screen">
             <h1>🎯 Spelling Quiz</h1>
             <div class="group-selection">
-                <button class="button" onclick="startQuiz(1)">Group 1 Words</button>
-                <button class="button" onclick="startQuiz(2)">Group 2 Words</button>
-                <button class="button" onclick="startQuiz(3)">Group 3 Words</button>
+                <button class="button" onclick="quiz.start(1)">Group 1 Words</button>
+                <button class="button" onclick="quiz.start(2)">Group 2 Words</button>
+                <button class="button" onclick="quiz.start(3)">Group 3 Words</button>
             </div>
         </div>
 
-        <div id="quiz-container">
-            <div class="score">Score: <span id="current-score">0</span>/<span id="total-score">0</span></div>
-            <button class="button" onclick="playCurrentWord()">🔊 Play Word</button>
-            <input type="text" id="answer-input" placeholder="Type the word here..." onkeypress="checkEnter(event)"
-    autocomplete="off" 
-    autocorrect="off" 
-    autocapitalize="off" 
-    spellcheck="false" 
-    data-ms-editor="false">
-            <button class="button" onclick="checkAnswer()">Submit</button>
+        <div id="quiz-screen" style="display: none;">
+            <div class="score">Score: <span id="score">0</span>/<span id="total">0</span></div>
+            <button class="button" onclick="quiz.playWord()">🔊 Play Word</button>
+            <div>
+                <input 
+                    type="text" 
+                    id="answer" 
+                    placeholder="Type the word here..."
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                >
+            </div>
+            <button class="button" onclick="quiz.checkAnswer()">Submit</button>
             <div id="feedback" class="feedback"></div>
-            <button class="button show-answer" onclick="showAnswer()" style="display: none">Show Answer</button>
+            <div id="hint" class="hint"></div>
+            <button id="hint-button" class="button hint-button" onclick="quiz.getHint()" style="display: none">Get Hint</button>
+            <button id="show-answer" class="button show-answer" onclick="quiz.showAnswer()" style="display: none">Show Answer</button>
         </div>
 
-        <div id="success-screen" class="success-screen">
-            <h2>🎉 Congratulations!</h2>
+        <div id="success-screen" style="display: none;">
+            <h1>🎉 Congratulations!</h1>
             <p>You've completed all the words!</p>
-            <button class="button restart" onclick="restartGame()">Play Again</button>
+            <button class="button" onclick="quiz.restart()">Play Again</button>
         </div>
     </div>
 
     <script>
-        const wordGroups = {
-            1: ['black', 'broke', 'break', 'blue', 'buy', 'built', 'build', 'bought', 'brought', 'grabbed', 'grabbing', 'baby', 'before', 'brother', 'breakfast', 'because', 'beside', 'behind'],
-            2: ['blown', 'brief', 'bought', 'brought', 'borrow', 'suburb', 'below', 'became', 'belief', 'believe', 'beneath', 'because', 'busy', 'budget', 'scribble', 'stubborn', 'beauty', 'business', 'probable', 'bury'],
-            3: ['abattoir', 'ambidextrous', 'bilingual', 'cybernetics', 'labyrinth', 'abdominal', 'ambiguity', 'broccoli', 'flamboyant', 'metabolism', 'abseiling', 'barometer', 'bureaucratic', 'inalienable', 'renewable', 'ambassador', 'beverage', 'contribute', 'indelible', 'substantially']
-        };
+        const quiz = {
+            words: {
+                1: ['black', 'broke', 'break', 'blue', 'buy', 'built', 'build', 'bought', 'brought', 'grabbed', 'grabbing', 'baby', 'before', 'brother', 'breakfast', 'because', 'beside', 'behind'],
+                2: ['blown', 'brief', 'bought', 'brought', 'borrow', 'suburb', 'below', 'became', 'belief', 'believe', 'beneath', 'because', 'busy', 'budget', 'scribble', 'stubborn', 'beauty', 'business', 'probable', 'bury'],
+                3: ['abattoir', 'ambidextrous', 'bilingual', 'cybernetics', 'labyrinth', 'abdominal', 'ambiguity', 'broccoli', 'flamboyant', 'metabolism', 'abseiling', 'barometer', 'bureaucratic', 'inalienable', 'renewable', 'ambassador', 'beverage', 'contribute', 'indelible', 'substantially']
+            },
+            currentWords: [],
+            currentIndex: 0,
+            score: 0,
+            attempts: 0,
+            hintLevel: 0,
+            synth: window.speechSynthesis,
+            selectedVoice: null,
 
-        let currentWords = [];
-        let currentWordIndex = 0;
-        let score = 0;
-        let attempts = 0;
-        let synth = window.speechSynthesis;
+            init() {
+                // Set up voice when voices are loaded
+                this.synth.onvoiceschanged = () => {
+                    const voices = this.synth.getVoices();
+                    
+                    // Try to find an Australian female voice
+                    this.selectedVoice = voices.find(voice => 
+                        voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('female')
+                    );
+                    
+                    // Fallback to any Australian voice
+                    if (!this.selectedVoice) {
+                        this.selectedVoice = voices.find(voice => voice.lang.includes('en-AU'));
+                    }
+                    
+                    // Further fallback to any English female voice
+                    if (!this.selectedVoice) {
+                        this.selectedVoice = voices.find(voice => 
+                            voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
+                        );
+                    }
+                };
+            },
 
-        function startQuiz(groupNumber) {
-            currentWords = [...wordGroups[groupNumber]];
-            shuffleArray(currentWords);
-            currentWordIndex = 0;
-            score = 0;
-            attempts = 0;
-            
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('quiz-container').style.display = 'block';
-            document.getElementById('success-screen').style.display = 'none';
-            
-            document.getElementById('total-score').textContent = currentWords.length;
-            document.getElementById('current-score').textContent = score;
-            
-            playCurrentWord();
-        }
+            elements: {
+                startScreen: document.getElementById('start-screen'),
+                quizScreen: document.getElementById('quiz-screen'),
+                successScreen: document.getElementById('success-screen'),
+                score: document.getElementById('score'),
+                total: document.getElementById('total'),
+                answer: document.getElementById('answer'),
+                feedback: document.getElementById('feedback'),
+                hint: document.getElementById('hint'),
+                hintButton: document.getElementById('hint-button'),
+                showAnswer: document.getElementById('show-answer')
+            },
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+            start(group) {
+                this.currentWords = [...this.words[group]];
+                this.shuffleWords();
+                this.currentIndex = 0;
+                this.score = 0;
+                this.attempts = 0;
+                this.hintLevel = 0;
 
-        let selectedVoice = null;
-
-        function loadVoices() {
-            const voices = synth.getVoices();
-            // Try to find an Australian female voice
-            selectedVoice = voices.find(voice => 
-                voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('female')
-            );
-            
-            // Fallback to any Australian voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.includes('en-AU'));
-            }
-            
-            // Further fallback to any English female voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => 
-                    voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
-                );
-            }
-            
-            // Final fallback to any available voice
-            if (!selectedVoice && voices.length > 0) {
-                selectedVoice = voices[0];
-            }
-        }
-
-        // Load voices when they become available
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = loadVoices;
-        }
-
-        function playCurrentWord() {
-            if (synth.speaking) {
-                synth.cancel();
-            }
-            
-            const utterance = new SpeechSynthesisUtterance(currentWords[currentWordIndex]);
-            utterance.rate = 0.8;
-            
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-            
-            // Add Australian accent characteristics
-            utterance.pitch = 1.0;
-            synth.speak(utterance);
-        }
-
-        function checkAnswer() {
-            const input = document.getElementById('answer-input');
-            const feedback = document.getElementById('feedback');
-            const showAnswerBtn = document.querySelector('.show-answer');
-            
-            if (input.value.toLowerCase().trim() === currentWords[currentWordIndex].toLowerCase()) {
-                feedback.textContent = '✅ Correct!';
-                feedback.className = 'feedback correct';
-                showAnswerBtn.style.display = 'none';
+                this.elements.startScreen.style.display = 'none';
+                this.elements.quizScreen.style.display = 'block';
+                this.elements.successScreen.style.display = 'none';
+                this.elements.total.textContent = this.currentWords.length;
+                this.elements.score.textContent = '0';
                 
-                if (attempts === 0) {
-                    score++;
-                    document.getElementById('current-score').textContent = score;
+                this.resetQuestion();
+                this.playWord();
+            },
+
+            shuffleWords() {
+                for (let i = this.currentWords.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.currentWords[i], this.currentWords[j]] = [this.currentWords[j], this.currentWords[i]];
+                }
+            },
+
+            playWord() {
+                if (this.synth.speaking) {
+                    this.synth.cancel();
+                }
+                const utterance = new SpeechSynthesisUtterance(this.currentWords[this.currentIndex]);
+                utterance.rate = 0.8;
+                
+                if (this.selectedVoice) {
+                    utterance.voice = this.selectedVoice;
                 }
                 
-                setTimeout(() => {
-                    nextWord();
-                }, 1000);
-            } else {
-                feedback.textContent = '❌ Try again!';
-                feedback.className = 'feedback incorrect';
-                showAnswerBtn.style.display = 'inline-block';
-                attempts++;
+                // Adjust pitch and rate for clearer pronunciation
+                utterance.pitch = 1.0;
+                this.synth.speak(utterance);
+            },
+
+            checkAnswer() {
+                const userAnswer = this.elements.answer.value.toLowerCase().trim();
+                const correctAnswer = this.currentWords[this.currentIndex].toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    if (this.attempts === 0) {
+                        this.score++;
+                        this.elements.score.textContent = this.score;
+                    }
+                    this.elements.feedback.textContent = '✅ Correct!';
+                    this.elements.feedback.className = 'feedback correct';
+                    this.elements.hintButton.style.display = 'none';
+                    this.elements.showAnswer.style.display = 'none';
+                    this.elements.hint.style.display = 'none';
+                    
+                    setTimeout(() => this.nextWord(), 1000);
+                } else {
+                    this.attempts++;
+                    this.elements.feedback.textContent = '❌ Try again!';
+                    this.elements.feedback.className = 'feedback incorrect';
+                    this.elements.hintButton.style.display = 'inline-block';
+                    this.elements.showAnswer.style.display = 'inline-block';
+                }
+            },
+
+            getHint() {
+                const word = this.currentWords[this.currentIndex];
+                this.elements.hint.style.display = 'block';
+
+                switch(this.hintLevel) {
+                    case 0:
+                        this.elements.hint.textContent = `The word has ${word.length} letters`;
+                        break;
+                    case 1:
+                        this.elements.hint.textContent = `The word starts with '${word[0]}'`;
+                        break;
+                    case 2:
+                        let pattern = "Hint: ";
+                        if (word.startsWith('be')) pattern += "starts with 'be-'";
+                        else if (word.endsWith('ing')) pattern += "ends with '-ing'";
+                        else if (word.endsWith('ed')) pattern += "ends with '-ed'";
+                        else pattern += `starts with '${word[0]}' and has ${word.length} letters`;
+                        this.elements.hint.textContent = pattern;
+                        this.elements.hintButton.style.display = 'none';
+                        break;
+                }
+                this.hintLevel++;
+            },
+
+            showAnswer() {
+                this.elements.answer.value = this.currentWords[this.currentIndex];
+                setTimeout(() => this.nextWord(), 1500);
+            },
+
+            nextWord() {
+                this.currentIndex++;
+                if (this.currentIndex >= this.currentWords.length) {
+                    this.showSuccess();
+                } else {
+                    this.resetQuestion();
+                }
+            },
+
+            resetQuestion() {
+                this.attempts = 0;
+                this.hintLevel = 0;
+                this.elements.answer.value = '';
+                this.elements.feedback.textContent = '';
+                this.elements.hint.style.display = 'none';
+                this.elements.hintButton.style.display = 'none';
+                this.elements.showAnswer.style.display = 'none';
+                this.playWord();
+            },
+
+            showSuccess() {
+                this.elements.quizScreen.style.display = 'none';
+                this.elements.successScreen.style.display = 'block';
+            },
+
+            restart() {
+                this.elements.successScreen.style.display = 'none';
+                this.elements.startScreen.style.display = 'block';
             }
-        }
+        };
 
-        function showAnswer() {
-            const input = document.getElementById('answer-input');
-            input.value = currentWords[currentWordIndex];
-            setTimeout(() => {
-                nextWord();
-            }, 1500);
-        }
-
-        function nextWord() {
-            currentWordIndex++;
-            attempts = 0;
-            
-            if (currentWordIndex >= currentWords.length) {
-                showSuccessScreen();
-            } else {
-                resetQuestion();
-            }
-        }
-
-        function resetQuestion() {
-            const input = document.getElementById('answer-input');
-            const feedback = document.getElementById('feedback');
-            const showAnswerBtn = document.querySelector('.show-answer');
-            
-            input.value = '';
-            feedback.textContent = '';
-            showAnswerBtn.style.display = 'none';
-            
-            playCurrentWord();
-        }
-
-        function showSuccessScreen() {
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('success-screen').style.display = 'block';
-        }
-
-        function restartGame() {
-            document.getElementById('success-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'block';
-        }
-
-        function checkEnter(event) {
+        // Add enter key support
+        document.getElementById('answer').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                checkAnswer();
+                quiz.checkAnswer();
             }
-        }
+        });
+
+        // Initialize the quiz
+        quiz.init();
     </script>
 </body>
 </html>
