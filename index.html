@@ -191,6 +191,38 @@
             }
         }
 
+        let selectedVoice = null;
+
+        function loadVoices() {
+            const voices = synth.getVoices();
+            // Try to find an Australian female voice
+            selectedVoice = voices.find(voice => 
+                voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('female')
+            );
+            
+            // Fallback to any Australian voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.includes('en-AU'));
+            }
+            
+            // Further fallback to any English female voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => 
+                    voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
+                );
+            }
+            
+            // Final fallback to any available voice
+            if (!selectedVoice && voices.length > 0) {
+                selectedVoice = voices[0];
+            }
+        }
+
+        // Load voices when they become available
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = loadVoices;
+        }
+
         function playCurrentWord() {
             if (synth.speaking) {
                 synth.cancel();
@@ -198,6 +230,13 @@
             
             const utterance = new SpeechSynthesisUtterance(currentWords[currentWordIndex]);
             utterance.rate = 0.8;
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            
+            // Add Australian accent characteristics
+            utterance.pitch = 1.0;
             synth.speak(utterance);
         }
 
