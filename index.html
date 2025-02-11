@@ -279,18 +279,22 @@
 
                 switch(this.hintLevel) {
                     case 0:
-                        this.elements.hint.textContent = `The word has ${word.length} letters`;
+                        // First hint: Number of letters
+                        this.elements.hint.textContent = `The word has ${word.length} letters: ${word.split('').map(() => '_').join(' ')}`;
                         break;
                     case 1:
-                        this.elements.hint.textContent = `The word starts with '${word[0]}'`;
+                        // Second hint: First half of the word
+                        const halfLength = Math.ceil(word.length / 2);
+                        const firstHalf = word.slice(0, halfLength);
+                        const restUnderscores = Array(word.length - halfLength).fill('_').join(' ');
+                        this.elements.hint.textContent = `First half of the word: ${firstHalf.split('').join(' ')} ${restUnderscores}`;
                         break;
                     case 2:
-                        let pattern = "Hint: ";
-                        if (word.startsWith('be')) pattern += "starts with 'be-'";
-                        else if (word.endsWith('ing')) pattern += "ends with '-ing'";
-                        else if (word.endsWith('ed')) pattern += "ends with '-ed'";
-                        else pattern += `starts with '${word[0]}' and has ${word.length} letters`;
-                        this.elements.hint.textContent = pattern;
+                        // Third hint: Second half of the word
+                        const secondHalfStart = Math.floor(word.length / 2);
+                        const secondHalf = word.slice(secondHalfStart);
+                        const startUnderscores = Array(secondHalfStart).fill('_').join(' ');
+                        this.elements.hint.textContent = `Second half revealed: ${startUnderscores} ${secondHalf.split('').join(' ')}`;
                         this.elements.hintButton.style.display = 'none';
                         break;
                 }
