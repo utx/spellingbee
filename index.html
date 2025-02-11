@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Quiz Game</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #2196F3;
+            --warning: #f44336;
+            --success: #4CAF50;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+        
+        .feedback {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            min-height: 2rem;
+        }
+        
+        .feedback.correct {
+            color: var(--success);
+        }
+        
+        .feedback.incorrect {
+            color: var(--warning);
+        }
+        
+        input[type="text"] {
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            width: 80%;
+            max-width: 300px;
+            margin: 1rem 0;
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        .success-screen {
+            display: none;
+            text-align: center;
+        }
+        
+        .success-screen h2 {
+            color: var(--success);
+            font-size: 2rem;
+        }
+        
+        .icon {
+            font-size: 2rem;
+            margin: 1rem;
+        }
+        
+        .group-selection {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        #quiz-container {
+            display: none;
+        }
+        
+        .show-answer {
+            background: #ff9800;
+        }
+        
+        .restart {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="start-screen">
+            <h1>🎯 Spelling Quiz</h1>
+            <div class="group-selection">
+                <button class="button" onclick="startQuiz(1)">Group 1 Words</button>
+                <button class="button" onclick="startQuiz(2)">Group 2 Words</button>
+                <button class="button" onclick="startQuiz(3)">Group 3 Words</button>
+            </div>
+        </div>
+
+        <div id="quiz-container">
+            <div class="score">Score: <span id="current-score">0</span>/<span id="total-score">0</span></div>
+            <button class="button" onclick="playCurrentWord()">🔊 Play Word</button>
+            <input type="text" id="answer-input" placeholder="Type the word here..." onkeypress="checkEnter(event)">
+            <button class="button" onclick="checkAnswer()">Submit</button>
+            <div id="feedback" class="feedback"></div>
+            <button class="button show-answer" onclick="showAnswer()" style="display: none">Show Answer</button>
+        </div>
+
+        <div id="success-screen" class="success-screen">
+            <h2>🎉 Congratulations!</h2>
+            <p>You've completed all the words!</p>
+            <button class="button restart" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const wordGroups = {
+            1: ['black', 'broke', 'break', 'blue', 'buy', 'built', 'build', 'bought', 'brought', 'grabbed', 'grabbing', 'baby', 'before', 'brother', 'breakfast', 'because', 'beside', 'behind'],
+            2: ['blown', 'brief', 'bought', 'brought', 'borrow', 'suburb', 'below', 'became', 'belief', 'believe', 'beneath', 'because', 'busy', 'budget', 'scribble', 'stubborn', 'beauty', 'business', 'probable', 'bury'],
+            3: ['abattoir', 'ambidextrous', 'bilingual', 'cybernetics', 'labyrinth', 'abdominal', 'ambiguity', 'broccoli', 'flamboyant', 'metabolism', 'abseiling', 'barometer', 'bureaucratic', 'inalienable', 'renewable', 'ambassador', 'beverage', 'contribute', 'indelible', 'substantially']
+        };
+
+        let currentWords = [];
+        let currentWordIndex = 0;
+        let score = 0;
+        let attempts = 0;
+        let synth = window.speechSynthesis;
+
+        function startQuiz(groupNumber) {
+            currentWords = [...wordGroups[groupNumber]];
+            shuffleArray(currentWords);
+            currentWordIndex = 0;
+            score = 0;
+            attempts = 0;
+            
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('success-screen').style.display = 'none';
+            
+            document.getElementById('total-score').textContent = currentWords.length;
+            document.getElementById('current-score').textContent = score;
+            
+            playCurrentWord();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function playCurrentWord() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(currentWords[currentWordIndex]);
+            utterance.rate = 0.8;
+            synth.speak(utterance);
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input');
+            const feedback = document.getElementById('feedback');
+            const showAnswerBtn = document.querySelector('.show-answer');
+            
+            if (input.value.toLowerCase().trim() === currentWords[currentWordIndex].toLowerCase()) {
+                feedback.textContent = '✅ Correct!';
+                feedback.className = 'feedback correct';
+                showAnswerBtn.style.display = 'none';
+                
+                if (attempts === 0) {
+                    score++;
+                    document.getElementById('current-score').textContent = score;
+                }
+                
+                setTimeout(() => {
+                    nextWord();
+                }, 1000);
+            } else {
+                feedback.textContent = '❌ Try again!';
+                feedback.className = 'feedback incorrect';
+                showAnswerBtn.style.display = 'inline-block';
+                attempts++;
+            }
+        }
+
+        function showAnswer() {
+            const input = document.getElementById('answer-input');
+            input.value = currentWords[currentWordIndex];
+            setTimeout(() => {
+                nextWord();
+            }, 1500);
+        }
+
+        function nextWord() {
+            currentWordIndex++;
+            attempts = 0;
+            
+            if (currentWordIndex >= currentWords.length) {
+                showSuccessScreen();
+            } else {
+                resetQuestion();
+            }
+        }
+
+        function resetQuestion() {
+            const input = document.getElementById('answer-input');
+            const feedback = document.getElementById('feedback');
+            const showAnswerBtn = document.querySelector('.show-answer');
+            
+            input.value = '';
+            feedback.textContent = '';
+            showAnswerBtn.style.display = 'none';
+            
+            playCurrentWord();
+        }
+
+        function showSuccessScreen() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('success-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+    </script>
+</body>
+</html>
