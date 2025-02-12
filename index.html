@@ -187,7 +187,7 @@
         <div id="quiz-container">
             <div class="score">Score: <span id="current-score">0</span>/<span id="total-score">0</span></div>
             <button class="button" onclick="playCurrentWord()">🔊 Play Word</button>
-            <input type="text" id="answer-input" placeholder="Type the word here..." onkeypress="checkEnter(event)">
+           <input type="text" id="answer-input" placeholder="Type the word here..." onkeypress="checkEnter(event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             <button class="button" onclick="checkAnswer()">Submit</button>
             <div id="feedback" class="feedback"></div>
             <button class="button show-answer" onclick="showAnswer()" style="display: none">Show Answer</button>
