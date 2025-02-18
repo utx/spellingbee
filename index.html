@@ -16,6 +16,7 @@
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray; }
         .fireworks { font-size: 30px; color: gold; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
     <div class="container" id="start-screen">
@@ -53,30 +54,68 @@
     </div>
 
     <script>
-        let words = [
-            { word: "advantageous", sentence: "Example sentence: Sophie found it <b>advantageous</b> to train her telepathic abilities before facing the Neverseen. (KOTLC)", definition: "Definition: Beneficial; giving an advantage." },
-            { word: "plateau", sentence: "Example sentence: Percy felt like his sword-fighting skills had hit a <b>plateau</b> until Chiron taught him a new technique. (Percy Jackson)", definition: "Definition: A state of little or no change following progress." },
-            { word: "fallacy", sentence: "Example sentence: The idea that all goblins were cruel was a <b>fallacy</b> that Morrigan quickly disproved. (Nevermoor)", definition: "Definition: A mistaken belief based on faulty reasoning." },
-            { word: "comparatively", sentence: "Example sentence: Compared to the horrors of Tartarus, Camp Half-Blood seemed <b>comparatively</b> peaceful. (Percy Jackson)", definition: "Definition: When something is viewed in relation to another thing." },
-            { word: "category", sentence: "Example sentence: Biana's skills in stealth placed her in a unique <b>category</b> among the Black Swan's members. (KOTLC)", definition: "Definition: A class or division of things with shared characteristics." },
-            { word: "aquamarine", sentence: "Example sentence: Lyra marveled at the <b>aquamarine</b> glow of the Northern Lights above the Arctic. (His Dark Materials)", definition: "Definition: A light bluish-green color, or a gemstone of the same color." },
-            { word: "analysis", sentence: "Example sentence: Fitz's careful <b>analysis</b> of the situation helped the team decide on their next move. (KOTLC)", definition: "Definition: A detailed examination of something to understand it better." },
-            { word: "satisfactorily", sentence: "Example sentence: Morrigan completed her Wundrous test <b>satisfactorily</b>, but Jupiter knew she had more potential. (Nevermoor)", definition: "Definition: In a way that meets expectations or requirements." },
-            { word: "magistrate", sentence: "Example sentence: The <b>magistrate</b> of Cittàgazze was nowhere to be found after the Spectres arrived. (His Dark Materials)", definition: "Definition: A civil officer or judge who administers the law." },
-            { word: "dilapidated", sentence: "Example sentence: The <b>dilapidated</b> mansion in the woods gave off a feeling of eerie abandonment. (Nevermoor)", definition: "Definition: In a state of disrepair or ruin due to age or neglect." },
-            { word: "classification", sentence: "Example sentence: The Neverseen's <b>classification</b> of Sophie as a threat only made her more determined to fight back. (KOTLC)", definition: "Definition: The process of arranging things into groups based on similarities." },
-            { word: "calculation", sentence: "Example sentence: Annabeth's precise <b>calculation</b> helped the group escape the Labyrinth's shifting walls. (Percy Jackson)", definition: "Definition: The process of using mathematics or careful planning to determine something." },
-            { word: "antiquated", sentence: "Example sentence: The <b>antiquated</b> traditions of the Conclave frustrated Morrigan, who wanted change. (Nevermoor)", definition: "Definition: Old-fashioned or outdated." },
-            { word: "unmanageable", sentence: "Example sentence: Controlling her newly awakened powers felt almost <b>unmanageable</b> for Sophie. (KOTLC)", definition: "Definition: Difficult or impossible to control or deal with." },
-            { word: "paradise", sentence: "Example sentence: Camp Half-Blood was a <b>paradise</b> for demigods compared to the dangers of the outside world. (Percy Jackson)", definition: "Definition: A place or state of perfect happiness." },
-            { word: "extravagant", sentence: "Example sentence: The <b>extravagant</b> feast at Wundersmith's palace was both enchanting and unsettling. (Nevermoor)", definition: "Definition: Excessively elaborate, costly, or luxurious." },
-            { word: "collateral", sentence: "Example sentence: The fight between the gods and Titans caused massive <b>collateral</b> damage to Olympus. (Percy Jackson)", definition: "Definition: Secondary or unintended damage, or something pledged as security." },
-            { word: "cancellation", sentence: "Example sentence: The <b>cancellation</b> of the Magisterium's experiment left many scholars furious. (His Dark Materials)", definition: "Definition: The act of deciding that an event will not take place." },
-            { word: "apprehensive", sentence: "Example sentence: Morrigan felt <b>apprehensive</b> about her first Wundrous Society challenge. (Nevermoor)", definition: "Definition: Anxious or fearful that something bad might happen." },
-            { word: "vocabulary", sentence: "Example sentence: Dex's extensive <b>vocabulary</b> of alchemy terms helped him create a powerful elixir. (KOTLC)", definition: "Definition: The body of words used in a language or by a person." }
+        let words = [];
+        let currentWordIndex = 0;
+
+        // Sample words to use if no CSV is found
+        const sampleWords = [
+            { 
+                word: "helpful", 
+                sentence: "Example sentence: The teacher's helpful explanation made the difficult concept clear.",
+                definition: "Definition: Ready to give help; useful."
+            },
+            { 
+                word: "difficult", 
+                sentence: "Example sentence: The difficult puzzle took an hour to solve.",
+                definition: "Definition: Needing much effort or skill to do or understand."
+            },
+            { 
+                word: "creative", 
+                sentence: "Example sentence: Her creative approach to problem-solving impressed everyone.",
+                definition: "Definition: Having good imagination or original ideas."
+            }
         ];
 
-        let currentWordIndex = 0;
+        // Function to load words from CSV
+        async function loadWordsFromCSV() {
+            try {
+                const response = await fetch('wordlist.csv');
+                if (!response.ok) {
+                    throw new Error('CSV file not found');
+                }
+                const csvText = await response.text();
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        words = results.data.map(row => ({
+                            word: row.word,
+                            sentence: `Example sentence: ${row.sentence.replace(row.word, `<b>${row.word}</b>`)}`,
+                            definition: `Definition: ${row.definition}`
+                        }));
+                        words = words.sort(() => Math.random() - 0.5);
+                        // Enable buttons after loading
+                        document.querySelector('.btn-primary').disabled = false;
+                        document.querySelector('.btn-secondary').disabled = false;
+                    },
+                    error: function(error) {
+                        console.error('Error parsing CSV:', error);
+                        loadSampleWords();
+                    }
+                });
+            } catch (error) {
+                console.error('Error reading file:', error);
+                loadSampleWords();
+            }
+        }
+
+        // Function to load sample words if CSV fails
+        function loadSampleWords() {
+            words = sampleWords;
+            words = words.sort(() => Math.random() - 0.5);
+            document.querySelector('.btn-primary').disabled = false;
+            document.querySelector('.btn-secondary').disabled = false;
+        }
 
         function startLearn() {
             document.getElementById("start-screen").classList.add("hidden");
@@ -98,6 +137,9 @@
             document.getElementById("learn-input").value = "";
             document.getElementById("learn-feedback").innerText = "";
             document.getElementById("practice-area").classList.add("hidden");
+            document.getElementById("learn-word").classList.remove("hidden");
+            document.getElementById("learn-sentence").classList.remove("hidden");
+            document.getElementById("learn-definition").classList.remove("hidden");
         }
 
         function loadTestWord() {
@@ -173,8 +215,12 @@
             words = words.sort(() => Math.random() - 0.5);
         }
 
-        // Initialize by shuffling words
-        words = words.sort(() => Math.random() - 0.5);
+        // Disable buttons until CSV is loaded
+        document.querySelector('.btn-primary').disabled = true;
+        document.querySelector('.btn-secondary').disabled = true;
+
+        // Load words when page loads
+        loadWordsFromCSV();
     </script>
 </body>
 </html>
