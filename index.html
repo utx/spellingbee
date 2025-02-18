@@ -3,523 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Quiz Game</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Spelling Game</title>
     <style>
-
-
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-.modal-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    text-align: center;
-    max-width: 500px;
-    width: 90%;
-}
-
-.modal-message {
-    font-size: 1.2rem;
-    margin: 1rem 0;
-    color: #333;
-    line-height: 1.6;
-}
-
-.continue-btn {
-    background: var(--secondary);
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-    font-family: 'Fredoka', sans-serif;
-}
-
-.continue-btn:hover {
-    transform: translateY(-2px);
-}
-
-
-@keyframes flash {
-    0% { background: white; }
-    25% { background: #2196F3; } /* Changed from #FFD700 to blue */
-    50% { background: white; }
-    75% { background: #2196F3; } /* Changed from #FFD700 to blue */
-    100% { background: white; }
-}
-.flash-animation {
-    animation: flash 1s;
-}
-
-.streak-alert {
-    background-color: #2196F3; /* Bright blue background */
-    color: white; /* White text */
-    font-size: 1.5rem;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s;
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 1000;
-}
-
-.results-table {
-    width: 100%;
-    margin: 20px 0;
-    border-collapse: collapse;
-}
-
-.results-table th, .results-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.results-table th {
-    background-color: #f5f5f5;
-}
-
-        :root {
-            --primary: #4CAF50;
-            --secondary: #2196F3;
-            --warning: #f44336;
-            --success: #4CAF50;
-        }
-        
-        body {
-            font-family: 'Fredoka', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-        }
-        
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .button {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            margin: 0.5rem;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-family: 'Fredoka', sans-serif;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        
-        .score {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin: 1rem 0;
-        }
-        
-        .feedback {
-            font-size: 1.2rem;
-            margin: 1rem 0;
-            min-height: 2rem;
-        }
-        
-        .feedback.correct {
-            color: var(--success);
-        }
-        
-        .feedback.incorrect {
-            color: var(--warning);
-        }
-        
-        input[type="text"] {
-            padding: 1rem;
-            font-size: 1.2rem;
-            border: 2px solid #ddd;
-            border-radius: 50px;
-            width: 80%;
-            max-width: 300px;
-            margin: 1rem 0;
-            text-align: center;
-            font-family: 'Fredoka', sans-serif;
-        }
-        
-        .success-screen {
-            display: none;
-            text-align: center;
-        }
-        
-        .success-screen h2 {
-            color: var(--success);
-            font-size: 2rem;
-        }
-        
-        .icon {
-            font-size: 2rem;
-            margin: 1rem;
-        }
-        
-        .group-selection {
-            display: grid;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        
-        #quiz-container {
-            display: none;
-        }
-        
-        .show-answer {
-            background: #ff9800;
-        }
-        
-        .restart {
-            background: var(--primary);
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray; }
+        button { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; border: none; border-radius: 5px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #28a745; color: white; }
+        .hidden { display: none; }
+        .correct { color: green; font-weight: bold; }
+        .wrong { color: red; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray; }
+        .fireworks { font-size: 30px; color: gold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="start-screen">
-            <h1>🎯 Spelling Quiz</h1>
-            <div class="group-selection">
-                <button class="button" onclick="startQuiz(1)">Group 1 Words</button>
-                <button class="button" onclick="startQuiz(2)">Group 2 Words</button>
-                <button class="button" onclick="startQuiz(3)">Group 3 Words</button>
-            </div>
-        </div>
+    <div class="container" id="start-screen">
+        <h1>Spelling Game</h1>
+        <button class="btn-primary" onclick="startLearn()">Learn Words</button>
+        <button class="btn-secondary" onclick="startTest()">Test Spelling</button>
+    </div>
 
-        <div id="quiz-container">
-            <div class="score">Score: <span id="current-score">0</span>/<span id="total-score">0</span></div>
-            <button class="button" onclick="playCurrentWord()">🔊 Play Word</button>
-           <input type="text" id="answer-input" placeholder="Type the word here..." onkeypress="checkEnter(event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-            <button class="button" onclick="checkAnswer()">Submit</button>
-            <div id="feedback" class="feedback"></div>
-            <button class="button show-answer" onclick="showAnswer()" style="display: none">Show Answer</button>
+    <div class="container hidden" id="learn-screen">
+        <h2 id="learn-word"></h2>
+        <p id="learn-sentence"></p>
+        <p id="learn-definition"></p>
+        <button onclick="startPractice()">Practice Word</button>
+        <div id="practice-area" class="hidden">
+            <button onclick="playWord()">🔊 Play Word</button>
+            <input type="text" id="learn-input" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+            <button onclick="checkLearnWord()">Submit</button>
+            <p id="learn-feedback"></p>
         </div>
+        <button onclick="nextLearnWord()">Next Word</button>
+    </div>
 
-        <div id="success-screen" class="success-screen">
-            <h2>🎉 Congratulations!</h2>
-            <p>You've completed all the words!</p>
-            <button class="button restart" onclick="restartGame()">Play Again</button>
-        </div>
+    <div class="container hidden" id="test-screen">
+        <h2>Spell the word you hear</h2>
+        <button onclick="playWord()">🔊 Hear Word</button>
+        <input type="text" id="test-input" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+        <button onclick="checkTestWord()">Submit</button>
+        <p id="test-feedback"></p>
+        <button onclick="nextTestWord()">Next Word</button>
+    </div>
+
+    <div class="container hidden" id="end-screen">
+        <h2>🎉 You've Practiced All Words! 🎉</h2>
+        <button onclick="restartGame()">Restart</button>
     </div>
 
     <script>
-        const wordGroups = {
-            1: ['black', 'broke', 'break', 'blue', 'buy', 'built', 'build', 'bought', 'brought', 'grabbed', 'grabbing', 'baby', 'before', 'brother', 'breakfast', 'because', 'beside', 'behind'],
-            2: ['blown', 'brief', 'bought', 'brought', 'borrow', 'suburb', 'below', 'became', 'belief', 'believe', 'beneath', 'because', 'busy', 'budget', 'scribble', 'stubborn', 'beauty', 'business', 'probable', 'bury'],
-            3: ['abattoir', 'ambidextrous', 'bilingual', 'cybernetics', 'labyrinth', 'abdominal', 'ambiguity', 'broccoli', 'flamboyant', 'metabolism', 'abseiling', 'barometer', 'bureaucratic', 'inalienable', 'renewable', 'ambassador', 'beverage', 'contribute', 'indelible', 'substantially']
-        };
+        let words = [
+            { word: "advantageous", sentence: "Example sentence: Sophie found it <b>advantageous</b> to train her telepathic abilities before facing the Neverseen. (KOTLC)", definition: "Definition: Beneficial; giving an advantage." },
+            { word: "plateau", sentence: "Example sentence: Percy felt like his sword-fighting skills had hit a <b>plateau</b> until Chiron taught him a new technique. (Percy Jackson)", definition: "Definition: A state of little or no change following progress." },
+            { word: "fallacy", sentence: "Example sentence: The idea that all goblins were cruel was a <b>fallacy</b> that Morrigan quickly disproved. (Nevermoor)", definition: "Definition: A mistaken belief based on faulty reasoning." },
+            { word: "comparatively", sentence: "Example sentence: Compared to the horrors of Tartarus, Camp Half-Blood seemed <b>comparatively</b> peaceful. (Percy Jackson)", definition: "Definition: When something is viewed in relation to another thing." },
+            { word: "category", sentence: "Example sentence: Biana's skills in stealth placed her in a unique <b>category</b> among the Black Swan's members. (KOTLC)", definition: "Definition: A class or division of things with shared characteristics." },
+            { word: "aquamarine", sentence: "Example sentence: Lyra marveled at the <b>aquamarine</b> glow of the Northern Lights above the Arctic. (His Dark Materials)", definition: "Definition: A light bluish-green color, or a gemstone of the same color." },
+            { word: "analysis", sentence: "Example sentence: Fitz's careful <b>analysis</b> of the situation helped the team decide on their next move. (KOTLC)", definition: "Definition: A detailed examination of something to understand it better." },
+            { word: "satisfactorily", sentence: "Example sentence: Morrigan completed her Wundrous test <b>satisfactorily</b>, but Jupiter knew she had more potential. (Nevermoor)", definition: "Definition: In a way that meets expectations or requirements." },
+            { word: "magistrate", sentence: "Example sentence: The <b>magistrate</b> of Cittàgazze was nowhere to be found after the Spectres arrived. (His Dark Materials)", definition: "Definition: A civil officer or judge who administers the law." },
+            { word: "dilapidated", sentence: "Example sentence: The <b>dilapidated</b> mansion in the woods gave off a feeling of eerie abandonment. (Nevermoor)", definition: "Definition: In a state of disrepair or ruin due to age or neglect." },
+            { word: "classification", sentence: "Example sentence: The Neverseen's <b>classification</b> of Sophie as a threat only made her more determined to fight back. (KOTLC)", definition: "Definition: The process of arranging things into groups based on similarities." },
+            { word: "calculation", sentence: "Example sentence: Annabeth's precise <b>calculation</b> helped the group escape the Labyrinth's shifting walls. (Percy Jackson)", definition: "Definition: The process of using mathematics or careful planning to determine something." },
+            { word: "antiquated", sentence: "Example sentence: The <b>antiquated</b> traditions of the Conclave frustrated Morrigan, who wanted change. (Nevermoor)", definition: "Definition: Old-fashioned or outdated." },
+            { word: "unmanageable", sentence: "Example sentence: Controlling her newly awakened powers felt almost <b>unmanageable</b> for Sophie. (KOTLC)", definition: "Definition: Difficult or impossible to control or deal with." },
+            { word: "paradise", sentence: "Example sentence: Camp Half-Blood was a <b>paradise</b> for demigods compared to the dangers of the outside world. (Percy Jackson)", definition: "Definition: A place or state of perfect happiness." },
+            { word: "extravagant", sentence: "Example sentence: The <b>extravagant</b> feast at Wundersmith's palace was both enchanting and unsettling. (Nevermoor)", definition: "Definition: Excessively elaborate, costly, or luxurious." },
+            { word: "collateral", sentence: "Example sentence: The fight between the gods and Titans caused massive <b>collateral</b> damage to Olympus. (Percy Jackson)", definition: "Definition: Secondary or unintended damage, or something pledged as security." },
+            { word: "cancellation", sentence: "Example sentence: The <b>cancellation</b> of the Magisterium's experiment left many scholars furious. (His Dark Materials)", definition: "Definition: The act of deciding that an event will not take place." },
+            { word: "apprehensive", sentence: "Example sentence: Morrigan felt <b>apprehensive</b> about her first Wundrous Society challenge. (Nevermoor)", definition: "Definition: Anxious or fearful that something bad might happen." },
+            { word: "vocabulary", sentence: "Example sentence: Dex's extensive <b>vocabulary</b> of alchemy terms helped him create a powerful elixir. (KOTLC)", definition: "Definition: The body of words used in a language or by a person." }
+        ];
 
-let streak = 0;
-let firstAttemptWords = [];
-let secondAttemptWords = [];
-let needsPracticeWords = [];
-        let currentWords = [];
         let currentWordIndex = 0;
-        let score = 0;
-        let attempts = 0;
-        let synth = window.speechSynthesis;
 
-        function startQuiz(groupNumber) {
-            currentWords = [...wordGroups[groupNumber]];
-            shuffleArray(currentWords);
-            currentWordIndex = 0;
-            score = 0;
-            attempts = 0;
-streak = 0;
-    firstAttemptWords = [];
-    secondAttemptWords = [];
-    needsPracticeWords = [];
-            
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('quiz-container').style.display = 'block';
-            document.getElementById('success-screen').style.display = 'none';
-            
-            document.getElementById('total-score').textContent = currentWords.length;
-            document.getElementById('current-score').textContent = score;
-            
-            playCurrentWord();
+        function startLearn() {
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("learn-screen").classList.remove("hidden");
+            loadLearnWord();
         }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
+        function startTest() {
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("test-screen").classList.remove("hidden");
+            loadTestWord();
         }
 
-        let selectedVoice = null;
-
-        function loadVoices() {
-            const voices = synth.getVoices();
-            // Try to find an Australian female voice
-            selectedVoice = voices.find(voice => 
-                voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('female')
-            );
-            
-            // Fallback to any Australian voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.includes('en-AU'));
-            }
-            
-            // Further fallback to any English female voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => 
-                    voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
-                );
-            }
-            
-            // Final fallback to any available voice
-            if (!selectedVoice && voices.length > 0) {
-                selectedVoice = voices[0];
-            }
+        function loadLearnWord() {
+            let wordObj = words[currentWordIndex];
+            document.getElementById("learn-word").innerText = wordObj.word;
+            document.getElementById("learn-sentence").innerHTML = wordObj.sentence;
+            document.getElementById("learn-definition").innerText = wordObj.definition;
+            document.getElementById("learn-input").value = "";
+            document.getElementById("learn-feedback").innerText = "";
+            document.getElementById("practice-area").classList.add("hidden");
         }
 
-        // Load voices when they become available
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = loadVoices;
+        function loadTestWord() {
+            let wordObj = words[currentWordIndex];
+            document.getElementById("test-input").value = "";
+            document.getElementById("test-feedback").innerText = "";
+            playWord();
         }
 
-        function playCurrentWord() {
-            if (synth.speaking) {
-                synth.cancel();
-            }
-            
-            const utterance = new SpeechSynthesisUtterance(currentWords[currentWordIndex]);
-            utterance.rate = 0.8;
-            
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-            
-            // Add Australian accent characteristics
-            utterance.pitch = 1.0;
-            synth.speak(utterance);
+        function playWord() {
+            let msg = new SpeechSynthesisUtterance(words[currentWordIndex].word);
+            msg.lang = 'en-AU';
+            window.speechSynthesis.speak(msg);
         }
 
-       function checkAnswer() {
-    const input = document.getElementById('answer-input');
-    const feedback = document.getElementById('feedback');
-    const showAnswerBtn = document.querySelector('.show-answer');
-    
-    if (input.value.toLowerCase().trim() === currentWords[currentWordIndex].toLowerCase()) {
-        feedback.textContent = '✅ Correct!';
-        feedback.className = 'feedback correct';
-        showAnswerBtn.style.display = 'none';
-        
-        if (attempts === 0) {
-            score++;
-            streak++;
-            firstAttemptWords.push(currentWords[currentWordIndex]);
-            if (streak === 3) {
-                showStreakAlert();
-                streak = 0;
-            }
-        } else if (attempts === 1) {
-            score += 0.5;
-            streak = 0;
-            secondAttemptWords.push(currentWords[currentWordIndex]);
-        } else {
-            streak = 0;
-            needsPracticeWords.push(currentWords[currentWordIndex]);
-        }
-        
-        document.getElementById('current-score').textContent = score;
-        
-        // Show the rhyming message modal
-        const rhymingMessage = getRhymingMessage(currentWords[currentWordIndex]);
-        showModal(rhymingMessage);
-    } else {
-        feedback.textContent = '❌ Try again!';
-        feedback.className = 'feedback incorrect';
-        showAnswerBtn.style.display = 'inline-block';
-        streak = 0;
-        attempts++;
-    }
-}
-function showStreakAlert() {
-    const container = document.querySelector('.container');
-    container.classList.add('flash-animation');
-    
-    const alert = document.createElement('div');
-    alert.className = 'streak-alert';
-    alert.textContent = '3 in a row! Streak alert! 🔥';
-    container.appendChild(alert);
-    
-    setTimeout(() => {
-        alert.style.opacity = '1';
-    }, 100);
-    
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        container.classList.remove('flash-animation');
-    }, 2000);
-    
-    setTimeout(() => {
-        alert.remove();
-    }, 2500);
-}
-
-
-        function showAnswer() {
-            const input = document.getElementById('answer-input');
-            input.value = currentWords[currentWordIndex];
-            setTimeout(() => {
-                nextWord();
-            }, 1500);
-        }
-
-        function nextWord() {
-            currentWordIndex++;
-            attempts = 0;
-            
-            if (currentWordIndex >= currentWords.length) {
-                showSuccessScreen();
+        function checkLearnWord() {
+            let input = document.getElementById("learn-input").value.trim().toLowerCase();
+            let correctWord = words[currentWordIndex].word.toLowerCase();
+            if (input === correctWord) {
+                document.getElementById("learn-feedback").innerHTML = "✅ Correct!";
             } else {
-                resetQuestion();
+                document.getElementById("learn-feedback").innerHTML = "❌ Wrong. Try again!";
             }
         }
 
-        function resetQuestion() {
-            const input = document.getElementById('answer-input');
-            const feedback = document.getElementById('feedback');
-            const showAnswerBtn = document.querySelector('.show-answer');
-            
-            input.value = '';
-            feedback.textContent = '';
-            showAnswerBtn.style.display = 'none';
-            
-            playCurrentWord();
+        function checkTestWord() {
+            let input = document.getElementById("test-input").value.trim().toLowerCase();
+            let correctWord = words[currentWordIndex].word.toLowerCase();
+            if (input === correctWord) {
+                document.getElementById("test-feedback").innerHTML = "✅ Correct!";
+            } else {
+                document.getElementById("test-feedback").innerHTML = "❌ Wrong. Try again!";
+            }
         }
 
-      function showSuccessScreen() {
-    const successScreen = document.getElementById('success-screen');
-    document.getElementById('quiz-container').style.display = 'none';
-    successScreen.style.display = 'block';
-    
-    const resultsHTML = `
-        <div class="results-table">
-            <table>
-                <tr>
-                    <th>Perfect! (1 point)</th>
-                    <th>Second Try (0.5 points)</th>
-                    <th>Need Practice (0 points)</th>
-                </tr>
-                <tr>
-                    <td>${firstAttemptWords.join('<br>')}</td>
-                    <td>${secondAttemptWords.join('<br>')}</td>
-                    <td>${needsPracticeWords.join('<br>')}</td>
-                </tr>
-            </table>
-        </div>
-        <p>Focus on practicing the words in the right column to improve your spelling!</p>
-    `;
-    
-    successScreen.insertAdjacentHTML('afterbegin', resultsHTML);
-}
+        function nextLearnWord() {
+            currentWordIndex++;
+            if (currentWordIndex < words.length) {
+                loadLearnWord();
+                // Make sure the word, sentence, and definition are visible
+                document.getElementById("learn-word").classList.remove("hidden");
+                document.getElementById("learn-sentence").classList.remove("hidden");
+                document.getElementById("learn-definition").classList.remove("hidden");
+                // Hide the practice area when moving to next word
+                document.getElementById("practice-area").classList.add("hidden");
+            } else {
+                document.getElementById("learn-screen").classList.add("hidden");
+                document.getElementById("end-screen").classList.remove("hidden");
+            }
+        }
+
+        function nextTestWord() {
+            currentWordIndex++;
+            if (currentWordIndex < words.length) {
+                loadTestWord();
+            } else {
+                document.getElementById("test-screen").classList.add("hidden");
+                document.getElementById("end-screen").classList.remove("hidden");
+            }
+        }
+
+        function startPractice() {
+            document.getElementById("learn-word").classList.add("hidden");
+            document.getElementById("learn-sentence").classList.add("hidden");
+            document.getElementById("learn-definition").classList.add("hidden");
+            document.getElementById("practice-area").classList.remove("hidden");
+        }
+
         function restartGame() {
-            document.getElementById('success-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'block';
+            document.getElementById("end-screen").classList.add("hidden");
+            document.getElementById("start-screen").classList.remove("hidden");
+            currentWordIndex = 0;
+            words = words.sort(() => Math.random() - 0.5);
         }
 
-        function checkEnter(event) {
-            if (event.key === 'Enter') {
-                checkAnswer();
-            }
-        }
-function getRhymingMessage(word) {
-    const rhymes = [
-        {
-            word: word,
-            message: `${word} you spelled with perfect sight,
-Like a Telepath's mind shining bright!`
-        },
-        {
-            word: word,
-            message: `${word} flows from your pen with grace,
-Like a Waymaker finding their place!`
-        },
-        {
-            word: word,
-            message: `${word} you wrote without a fight,
-Like a demigod's sword gleaming bright!`
-        },
-        {
-            word: word,
-            message: `${word} you spelled with wondrous flair,
-Like a Wundersmith dancing on air!`
-        }
-    ];
-    
-    return rhymes[Math.floor(Math.random() * rhymes.length)].message;
-}
-
-function showModal(message) {
-    const modal = document.getElementById('success-modal');
-    const rhymeMessage = document.getElementById('rhyme-message');
-    rhymeMessage.textContent = message;
-    modal.style.display = 'block';
-}
-
-function closeModal() {
-    const modal = document.getElementById('success-modal');
-    modal.style.display = 'none';
-    nextWord();
-}
-
+        // Initialize by shuffling words
+        words = words.sort(() => Math.random() - 0.5);
     </script>
-<div id="success-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-message" id="rhyme-message"></div>
-        <button class="continue-btn" onclick="closeModal()">Continue</button>
-    </div>
-</div>
 </body>
 </html>
